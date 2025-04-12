@@ -69,4 +69,30 @@ process_args(){
                     exit 1
                 fi
                 TARGET="$2"
+                run_dns_diagnostics "$TARGET"
+                shift 2
+                ;;
+            -p|--port)
+                if [[ -z "$2" || "$2" == -* ]]; then
+                    log_error "Error: Missing target for port scanning"
+                    exit 1
+                fi
+                HOST="$2"
+                PORTS="$3"
+                if [[ -z "$PORTS" || "$PORTS" == -* ]]; then
+                    PORTS="common"
+                    shift 2
+                else
+                    shift 3
+                fi
+                run_port_scan "$HOST" "$PORTS"
+                ;;
+            -r|--route)
+                if [[ -z "$2" || "$2" == -*]]; then
+                    log_error "Error: Missing target for traceroute"
+                    exit 1
+                fi
+                TARGET="$2"
+                run_route_trace "$TARGET"
+                shift 2
 }
