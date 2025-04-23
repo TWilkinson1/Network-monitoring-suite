@@ -2,7 +2,7 @@
 
 # Network Diagnostic Suite
 # A comprehensive tool for network troubleshooting
-# Author: Your Name
+# Author: Thomas Wilkinson
 # Version: 1.0
 
 # Set script directory
