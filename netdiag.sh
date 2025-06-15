@@ -69,8 +69,8 @@ process_args(){
                     exit 1
                 fi
                 TARGET="$2"
-                run_dns_diagnostics "$TARGET"
                 shift 2
+                run_dns_diagnostics "$TARGET"
                 ;;
             -p|--port)
                 if [[ -z "$2" || "$2" == -* ]]; then
@@ -81,9 +81,9 @@ process_args(){
                 PORTS="$3"
                 if [[ -z "$PORTS" || "$PORTS" == -* ]]; then
                     PORTS="common"
-                    shift 2
-                else
                     shift 3
+                else
+                    shift 2
                 fi
                 run_port_scan "$HOST" "$PORTS"
                 ;;
@@ -95,4 +95,53 @@ process_args(){
                 TARGET="$2"
                 run_route_trace "$TARGET"
                 shift 2
+                ;;
+            -t | --test)
+                if [[ -z "$2" || "$2" == -* ]]; then
+                    log_error "Error: Missing target for performance test"
+                    exit 1
+                fi
+                TARGET="$2"
+                run_performance_test "$TARGET"
+                shift 2
+                ;;
+            -v | --verbose)
+                VERBOSE=true
+                export VERBOSE
+                shift
+                ;;
+            -o | --output)
+                if [[ -z "$2" || "$2" == -* ]]; then
+                    log_error "Error: Missing output file"
+                    exit 1
+                fi
+                OUTPUT_FILE="$2"
+                shift 2
+                ;;
+            *)
+                log_error "Error: Unknown option $1"
+                display_usage
+                exit 1
+                ;;
+        esac
+    done
+}
+
+#run_diagnostics
+run_all_diagnostics() {
+    local target="$1"
+    
+    log_info "Running all diagnostics on $target"
+
+    #Ip or domain check
+    if [[ "$target" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$]]; then
+        #if ip
+        host_ip="$target"
+        host_name=$(dig +short -x "$target" 2>/dev/null || echo "Unknown")
+    else
+        #if domain
+        host_name="$target"
+        host_ip=$(dig +short "$target" 2>/dev/null || echo "Unknown")
+    fi
+
 }
